@@ -2,6 +2,7 @@ package com.smallcake.zanghua;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         mEdtMsg = findViewById(R.id.edtMsg);
         mChkIsLong = findViewById(R.id.cekIsLong);
 
+        mEdtMsg.setText(getIntent().getStringExtra("msg"));
     }
 
     private void initDataBase() {
@@ -65,23 +67,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickGet(View v){
-        String tableName = mChkIsLong.isChecked()?"max_1":"min_1";
-        Random random = new Random();
-        random.nextInt(100);
-
         ZanghuaDataBase zanghuaDataBase = new ZanghuaDataBase(this);
-        SQLiteDatabase sqLiteDatabase = zanghuaDataBase.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT msg FROM "+ tableName +" ORDER BY (RANDOM() % (SELECT COUNT(*) FROM "+ tableName +")) limit 1",null);
-
-        if (cursor.moveToNext())
-        {
-            mEdtMsg.setText(cursor.getString(0));
-        }
-
-        cursor.close();
-        sqLiteDatabase.close();
+        mEdtMsg.setText(zanghuaDataBase.randomGet(mChkIsLong.isChecked()));
         zanghuaDataBase.close();
-
-
     }
 }
